@@ -18,14 +18,6 @@ from telegram.request import HTTPXRequest
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.WARNING,
-)
-
-TOKEN      = os.getenv("BOT_TOKEN",      "8298687789:AAFlgj6AF4LgjBK68qSpC5paiN9Oh3nSc6Q")
-MANAGER_ID = os.getenv("MANAGER_CHAT_ID", "8236824332")
-
-# Reception va Admin Telegram linklarini shu yerda o'zgartiring:
-RECEPTION_LINK = "https://t.me/careercenter_reception"
-ADMIN_LINK     = "https://t.me/muhammadyusuf_4347"
 
 # ════════════════════════════════════════════════════════════════
 #  IN-MEMORY STORAGE
