@@ -17,12 +17,12 @@ _SUB_PROMPT = (
 
 async def on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    await query.answer()
     data  = query.data
 
-    # ── Obuna tekshirish ──────────────────────────────────────────
+    # ── Obuna tekshirish tugmasi ──────────────────────────────────
     if data == "check_sub":
         if await is_subscribed(query.from_user.id, context.bot):
+            await query.answer("✅ Obuna tasdiqlandi!")
             if context.user_data.get("phone"):
                 await query.message.reply_text(
                     "✅ <b>Ajoyib!</b> Obuna tasdiqlandi! Quyidagi bo'limlardan birini tanlang 👇",
@@ -35,17 +35,26 @@ async def on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                     parse_mode="HTML", reply_markup=CONTACT_KB,
                 )
         else:
-            await query.answer("Siz hali kanalga obuna bo'lmagansiz!", show_alert=True)
+            await query.answer("❌ Siz hali kanalga obuna bo'lmagansiz!", show_alert=True)
         return
 
     # ── Admin callbacklar uchun obuna tekshirilmaydi ──────────────
-    if not data.startswith("adm_"):
-        if not await is_subscribed(query.from_user.id, context.bot):
-            await query.answer("Iltimos, avval kanalga obuna bo'ling!", show_alert=True)
-            await query.message.reply_text(
-                _SUB_PROMPT, parse_mode="HTML", reply_markup=subscription_kb(),
-            )
+    if data.startswith("adm_"):
+        await query.answer()
+        if str(query.from_user.id) != MANAGER_ID:
             return
+        await handle_admin_cb(query, data)
+        return
+
+    # ── Barcha boshqa callbacklar: avval obuna tekshiriladi ───────
+    if not await is_subscribed(query.from_user.id, context.bot):
+        await query.answer("Iltimos, avval kanalga obuna bo'ling!", show_alert=True)
+        await query.message.reply_text(
+            _SUB_PROMPT, parse_mode="HTML", reply_markup=subscription_kb(),
+        )
+        return
+
+    await query.answer()
 
     # ── Kurs ma'lumotlari ─────────────────────────────────────────
     if data.startswith("course_"):
@@ -88,11 +97,4 @@ async def on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             f"Reception bilan bog'laning: {RECEPTION_LINK}",
             parse_mode="HTML",
         )
-        return
-
-    # ── Admin callbacklar ─────────────────────────────────────────
-    if data.startswith("adm_"):
-        if str(query.from_user.id) != MANAGER_ID:
-            return
-        await handle_admin_cb(query, data)
         return
